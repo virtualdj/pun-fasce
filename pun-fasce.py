@@ -31,6 +31,13 @@ def get_fascia(data, festivo, ora):
 def fmt_mean(list):
 	return format(round(mean(list), 5), '.6f')
 
+# Calcola la fascia F23 sulla base delle fasce F2 e F3, formattando il risultato
+def calc_f23(f2, f3):
+	# La motivazione del calcolo è oscura, ma sembra corretta, vedere:
+	# https://github.com/virtualdj/pun_sensor/issues/24#issuecomment-1829846806
+
+	return format(round(mean(f2), 5) * .46 + round(mean(f3), 5) * .54, '.6f')
+
 # Recupera l'anno dall'argomento (o usa quello corrente)
 parser = argparse.ArgumentParser(description='Mostra i costi del PUN di un anno, diviso per mesi e fasce orarie.')
 parser.add_argument('year', type=int, nargs='?',
@@ -88,9 +95,10 @@ for f in archive.filelist:
 		f1 = []
 		f2 = []
 		f3 = []
+		monoorario = []
 
 		# Header output
-		print('Mese','F1 (€/kWh)','F2 (€/kWh)','F3 (€/kWh)', sep='\t')
+		print('Mese','MO (€/kWh)','F1 (€/kWh)','F2 (€/kWh)','F3 (€/kWh)','F23 (€/kWh)', sep='\t')
 
 		# Esamina le righe non vuote a partire dalla seconda
 		for row in range(2, sheet.max_row):
@@ -118,7 +126,7 @@ for f in archive.filelist:
 				# Nuovo mese	
 				# Stampa i totali precedenti
 				if (prev_month > 0):
-					print(f'{prev_month}/{anno}', fmt_mean(f1), fmt_mean(f2), fmt_mean(f3), sep='\t')
+					print(f'{prev_month}/{anno}', fmt_mean(monoorario), fmt_mean(f1), fmt_mean(f2), fmt_mean(f3), calc_f23(f2, f3), sep='\t')
 			
 				# Memorizza il nuovo mese
 				prev_month = dat2.month
@@ -127,6 +135,7 @@ for f in archive.filelist:
 				f1.clear()
 				f2.clear()
 				f3.clear()
+				monoorario.clear()
 	
 			# Estrae la fascia oraria
 			#print("Len", len(f1), len(f2), len(f3))
@@ -137,12 +146,13 @@ for f in archive.filelist:
 				f2.append(prezzo)
 			elif fascia == 1:
 				f1.append(prezzo)
+			monoorario.append(prezzo)
 
 		# Verifica se l'ultimo mese è completo
 		next_day = dat2 + timedelta(days=1)
 		if (next_day.month != prev_month):
 			# Mese completo, mostra statistiche
-			print(f'{prev_month}/{anno}', fmt_mean(f1), fmt_mean(f2), fmt_mean(f3), sep='\t')
+			print(f'{prev_month}/{anno}', fmt_mean(monoorario), fmt_mean(f1), fmt_mean(f2), fmt_mean(f3), calc_f23(f2, f3), sep='\t')
 
 # Controlla se il file è stato trovato
 if (not xlsFound):
