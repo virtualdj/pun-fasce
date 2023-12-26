@@ -13,7 +13,7 @@ I valori vengono scaricati dal sito [MercatoElettrico.org](https://www.mercatoel
 
 `python3 ./pun-fasce.py <anno>`
 
-L'`anno` è opzionale e in quel caso si intende l'anno corrente.
+L'`anno` è opzionale e in quel caso si intende l'anno corrente.  
 Il risultato è simile a questo:
 
 ```text

@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '0 1 1 * *'
+    - cron: '0 5 1 * *'
 
 permissions:
   contents: read
@@ -15,6 +15,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v3
@@ -26,6 +28,65 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Test application output
+
+    # Run application
+    - name: Run application
+      id: run_script
       run: |
-        python pun-fasce.py
+        ANNO=$(( $(date +'%m') < 2 ? $(date +'%Y') - 1 : $(date +'%Y') ))
+        echo "Running app in $(date +'%m/%Y') for year $ANNO."
+        {
+          echo "result<<EOF"
+          python pun-fasce.py $ANNO
+          echo EOF
+        } >> $GITHUB_ENV
+
+    # Show output (using environment variable to avoid quoting)
+    - name: Show application output
+      run: echo -e "$RES"
+      shell: bash
+      env:
+        RES: ${{ env.result }}
+
+    # Environment variable character escaping
+    - name: Character escaping
+      id: run_escaping
+      run: |
+        RES="${RES//$'\n'/\\n}"  # Escape new lines
+        RES="${RES//$'\t'/\\t}"  # Escape tabs
+        RES=${RES//\//\\\/}      # Escape slashes
+        echo "Escaped RES (env.result) = |$RES|"
+        echo "result=$RES" >> $GITHUB_ENV
+      shell: bash
+      env:
+        RES: ${{ env.result }}
+
+    # Update README with content of environment variable
+    - name: Update README.md
+      run: |
+        # Replace anything after line with "Il risultato"
+        sed -i -n -e '/Il risultato/{p;a\' -e '\n```text\n${{ env.result }}\n```' -e '}' -e '/Il risultato/,$!p' README.md
+
+    # Push changes to repository, if any
+    - name: Check for changes
+      id: check_changes
+      run: |
+        git diff --exit-code > /dev/null && echo 'changed=false' >> $GITHUB_ENV || echo 'changed=true' >> $GITHUB_ENV
+    - name: Pull-request
+      uses: repo-sync/pull-request@v2
+      if: env.changed == 'true'
+      with:
+        destination_branch: "main"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Commit
+      if: env.changed == 'true'
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add .
+        git commit -m "Aggiornamento dati mensili README" -a
+    - name: Push changes
+      if: env.changed == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
