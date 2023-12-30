@@ -3,7 +3,7 @@
 Mostra i costi del PUN di un anno, diviso per mesi e fasce orarie (F1, F2 e F3).
 I valori vengono scaricati dal sito [MercatoElettrico.org](https://www.mercatoelettrico.org/It/Default.aspx).
 
-È stato aggiunto anche il calcolo della fascia mono-oraria e F23, basata su calcoli documentati non in modo perfetto ma che sembrano portare a risultati identici (o perlomeno simili) alle tariffe ufficiali.
+È stato aggiunto anche il valore della fascia mono-oraria e F23, quest'ultima basata su calcoli documentati non in modo perfetto ma che sembrano portare a risultati identici (o perlomeno simili) alle tariffe ufficiali.
 
 ## Installazione dei prerequisiti
 
