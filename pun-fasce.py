@@ -53,7 +53,7 @@ else:
 
 # Scarica il file ZIP con i dati dal sito Mercato Elettrico
 try:
-	req = requests.get(f'https://www.mercatoelettrico.org/It/MenuBiblioteca/Documenti/Anno{anno}.zip')
+	req = requests.get(f'https://www.mercatoelettrico.org/it-it/Home/Esiti/Elettricita/MGP/Statistiche/DatiStorici/moduleId/10874/controller/GmeDatiStoriciItem/action/DownloadFile?fileName=Anno{anno}.zip')
 except:
 	raise SystemExit('ERRORE: sito web MercatoElettrico.org non disponibile!')
 
