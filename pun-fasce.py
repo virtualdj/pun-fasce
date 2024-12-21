@@ -154,6 +154,9 @@ for f in archive.filelist:
 			# Mese completo, mostra statistiche
 			print(f'{prev_month}/{anno}', fmt_mean(monoorario), fmt_mean(f1), fmt_mean(f2), fmt_mean(f3), calc_f23(f2, f3), sep='\t')
 
+# Chiude l'archivio
+archive.close()
+
 # Controlla se il file è stato trovato
 if (not xlsFound):
 	raise SystemExit('ERRORE: nessun file Excel è stato trovato nel file scaricato dal sito.')
