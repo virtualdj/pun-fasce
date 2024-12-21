@@ -101,7 +101,7 @@ for f in archive.filelist:
 		print('Mese','MO (€/kWh)','F1 (€/kWh)','F2 (€/kWh)','F3 (€/kWh)','F23 (€/kWh)', sep='\t')
 
 		# Esamina le righe non vuote a partire dalla seconda
-		for row in range(2, sheet.max_row):
+		for row in range(2, sheet.max_row + 1):
 			if (sheet.cell(row, 1).value is None):
 				break
 	
