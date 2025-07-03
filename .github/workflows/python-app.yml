@@ -78,6 +78,13 @@ jobs:
       with:
         destination_branch: "main"
         github_token: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Try to circumvent the "unable to index file 'README.md'" error
+    - name: Fix Git permissions
+      if: env.changed == 'true'
+      run: sudo chown -R $USER:$USER .git
+
+    # Commit and push
     - name: Commit
       if: env.changed == 'true'
       run: |
